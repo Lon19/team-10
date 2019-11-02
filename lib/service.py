@@ -73,10 +73,10 @@ def getAllWards():
     for each in dfs:
         rows, cols = each.shape
         for i in range(0, rows, 2):
-            mods.append({"Geo_name ": each[i][1], "age-group" : {
-                "age_name" : each[i][6], "value" :  each[i][7],
-                "age_name" : each[i+1][6], "value" :  each[i+1][7]
-            }})
+            mods.append({"ward_name ": each[i][1], "age-group" : [
+                {"age_name" : each[i][6], "value" :  each[i][7]},
+                {"age_name" : each[i+1][6], "value" :  each[i+1][7]}
+            ]})
         
     return jsonify(data)
 
