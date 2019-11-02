@@ -64,6 +64,8 @@ def getAllLads():
 		wards = nomis.get_geo_code(value=str(lads[i][1])+"TYPE236").values
 		wardsGeoData = [wards[j][1] for j in range(wards.shape[0])]
 		data['districts'].append({'districtName':lads[i][0], 'wards':getWardData(wardsGeoData)})
+	with open("data.json", "w") as file:
+    	json.dump(data, file, indent=4)
 	return jsonify(data)
 
 def getWardData(wardList):
