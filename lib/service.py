@@ -40,6 +40,82 @@ def getWards():
     #jsa.fillna(0)
     return getAllWards()
 
+@app.route('/highestDistrict')
+def getHighestDistrict():
+	with open('data.json') as f:
+		data = json.load(f)
+	districtData = []
+	highName = 0
+	highValue = 0
+	for i in data['districts']:
+		total = 0
+		for ward in i['wards']:
+			for j in ward['age-group']:
+				total += j['value']
+		if total > highValue:
+			highValue = total
+			highName = i['districtName']
+		print(total)
+	return {'name': highName, 'total': highValue}
+
+@app.route('/highestWard')
+def getHighestWard():
+	with open('data.json') as f:
+		data = json.load(f)
+	districtData = []
+	highName, highValue = 0, 0
+	for i in data['districts']:
+		for ward in i['wards']:
+			total = 0
+			for j in ward['age-group']:
+				total += j['value']
+			if total > highValue:
+				highValue = total
+				highName = ward['ward_name']
+	return {'name': highName, 'total': highValue}
+
+@app.route('/highestWardByAge')
+def getHighestWardByAge():
+	with open('data.json') as f:
+		data = json.load(f)
+	highName18, highValue18, highName25, highValue25 = 0,0,0,0
+	for i in data['districts']:
+		for ward in i['wards']:
+			t1, t2 = 0,0
+			for j in ward['age-group']:
+				if '18' in j['age_name']:
+					t1 = j['value']
+				else:
+					t2 = j['value']
+			if t1 > highValue18:
+				highValue18 = t1
+				highName18 = ward['ward_name']
+			if t2 > highValue25:
+				highValue25 = t2
+				highName25 = ward['ward_name']
+	return jsonify([{'Name for 18-24': highName18, 'Total for 18-24': highValue18}, {'Name for 25-29': highName25, 'Total for 25-29': highValue25}])
+
+@app.route('/highestDistrictByAge')
+def getHighestDistrictByAge():
+	with open('data.json') as f:
+		data = json.load(f)
+	highName18, highValue18, highName25, highValue25 = 0,0,0,0
+	for i in data['districts']:
+		t1, t2 = 0,0
+		for ward in i['wards']:
+			for j in ward['age-group']:
+				if '18' in j['age_name']:
+					t1 += j['value']
+				else:
+					t2 += j['value']
+		if t1 > highValue18:
+			highValue18 = t1
+			highName18 = ward['ward_name']
+		if t2 > highValue25:
+			highValue25 = t2
+			highName25 = ward['ward_name']
+	return jsonify([{'Name for 18-24': highName18, 'Total for 18-24': highValue18}, {'Name for 25-29': highName25, 'Total for 25-29': highValue25}])
+
 def getwards(wards):
     jsa = nomis._nomis_data(geography=wards,sex='7',item=1,measures=20100)
     print(jsa)
@@ -64,8 +140,6 @@ def getAllLads():
 		wards = nomis.get_geo_code(value=str(lads[i][1])+"TYPE236").values
 		wardsGeoData = [wards[j][1] for j in range(wards.shape[0])]
 		data['districts'].append({'districtName':lads[i][0], 'wards':getWardData(wardsGeoData)})
-	with open("data.json", "w") as file:
-    	json.dump(data, file, indent=4)
 	return jsonify(data)
 
 def getWardData(wardList):
