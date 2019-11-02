@@ -2,12 +2,25 @@ from flask import Flask, request, jsonify
 import nomis_api_wrapper
 import ssl
 import pandas as pd
+import json
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
 nomis=nomis_api_wrapper.NOMIS_CONFIG()
 
 app = Flask(__name__)
+
+@app.route('/fetchData')
+def getData():
+	with open('data.json') as f:
+		data = json.load(f)
+	ladName = request.args.get('lad')
+	wardName = request.args.get('ward')
+	for i in data['districts']:
+		if i['districtName'] == ladName:
+			for j in i['wards']:
+				if j['ward_name'] == wardName:
+					return j
 
 @app.route("/ward")
 def wardTotal():
