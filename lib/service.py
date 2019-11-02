@@ -16,7 +16,7 @@ app = Flask(__name__)
 def getData():
 	with open('data.json') as f:
 		data = json.load(f)
-	#return jsonify(data)
+	return jsonify(data)
 	ladName = request.args.get('lad')
 	wardName = request.args.get('ward')
 	for i in data['districts']:
@@ -24,7 +24,8 @@ def getData():
 			for j in i['wards']:
 				if j['ward_name'] == wardName:
 					print("FOUND-------------------------------------")
-					response = jsonify(j)
+					response = jsonify(str(j))
+					print(str(j))
 					response.headers.add('Access-Control-Allow-Origin', '*')
 					return response
 	print("Not found----")
