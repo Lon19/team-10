@@ -35,8 +35,11 @@ class App extends Component {
 		}
 	}
 	projection() {
-		return geoMercator()
-			.scale(100)
+		return geoAlbers()
+        .center([0, 55.4])
+           .rotate([4.4, 0])
+           .parallels([50, 60])
+			.scale(3000)
 			.translate([800/2, 450/2])
 		/*geoAlbers()
 			.center([0,42.954])
