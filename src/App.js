@@ -21,7 +21,7 @@ wards_features.map((w, i) => {
 	let wcdo = w.properties.WD13CDO;
 	lads_features.map((l, ind) => {
 		let lcdo = l.properties.LAD13CDO;
-		if (wcdo.includes(lcdo)) {
+		if (wcdo.substring(0, 4).includes(lcdo)) {
 			wards_to_lads[ward] = l.properties.LAD13NM;
 		}
 	});
@@ -39,7 +39,7 @@ class App extends Component {
         .center([0, 55.4])
            .rotate([4.4, 0])
            .parallels([50, 60])
-			.scale(3000)
+			.scale(4000)
 			.translate([800/2, 450/2])
 		/*geoAlbers()
 			.center([0,42.954])
