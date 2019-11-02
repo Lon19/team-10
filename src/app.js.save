@@ -50,7 +50,7 @@ class App extends Component {
 			.center([0,42.954])
   			.parallels([41,44])
   			.translate([800/2,450/2])
-c  			.scale(100)
+  			.scale(100)
 			.scale(100)
 			.translate([800/2, 450/2]);
 		*/
@@ -58,15 +58,13 @@ c  			.scale(100)
 
     async compute_colour(wd13nm) {
         //const response = await axios.get("http://localhost:5005/fetchData?ward="+wd13nm+"&lad=" + wards_to_lads[wd13nm]);
-        const response = fetch("http://127.0.0.1:5005/fetchData?ward="+wd13nm+"&lad="+wards_to_lads[wd13nm]);
-		//const response = fetch("http://127.0.0.1:5005/fetchData", {ward: wd13nm, lad: wards_to_lads[wd13nm]})
-		let data = response;
-		let count = 0;
+        const response = fetch("http://localhost:5005/fetchData", {ward: wd13nm, lad: wards_to_lads[wd13nm]})
+		let data = JSON.parse(response.data);
+        let count = 0;
         // for (int i = 0; i < data['age-group'].size())
         data['age-group'].map((a, v) => {
             count += v;
-        });
-		console.log(data, count);
+        })
         // let colour = (38, 50, 56, 0);
         let colour = "#666666";
         if (count <= 20) {
