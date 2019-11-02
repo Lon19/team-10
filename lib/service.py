@@ -1,18 +1,20 @@
-from flask_cors import cross_origin
+from flask_cors import CORS
 from flask import Flask, request, jsonify
 import nomis_api_wrapper
 import ssl
 import pandas as pd
 import json
 
+
+
 ssl._create_default_https_context = ssl._create_unverified_context
 
 nomis=nomis_api_wrapper.NOMIS_CONFIG()
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/fetchData')
-@cross_origin()
 def getData():
 	with open('data.json') as f:
 		data = json.load(f)

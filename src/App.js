@@ -17,6 +17,8 @@ const wards_features = feature(wards, wards.objects.wards).features;
 const lads_features = feature(lads, lads.objects.lad).features;
 console.log(wards_features);
 
+let wards_and_lads_values = {};
+//[w, l] -> value
 let wards_to_lads = {};
 wards_features.map((w, i) => {
 	let ward = w.properties.WD13NM;
@@ -56,17 +58,32 @@ c  			.scale(100)
 		*/
 	}
 
+    async get_all_data() {
+        const response = await fetch("http://127.0.0.1:5005/fetchData");
+        let data = JSON.parse(response);
+        let districts = data['districts'];
+        districts.map((d, ws) => {
+            ws.map((w) => {
+                let wl = [];
+                wl.append(w['ward_name']);
+                wl.append(d['districtName']);
+                let total = 0;
+                total += w['age-group'][0]['value'];
+                total += w['age-group'][1]['value'];
+                wards_and_lads_values[wl] = total;
+            })
+        })
+    }
+
+
+
     async compute_colour(wd13nm) {
         //const response = await axios.get("http://localhost:5005/fetchData?ward="+wd13nm+"&lad=" + wards_to_lads[wd13nm]);
-        const response = fetch("http://127.0.0.1:5005/fetchData?ward="+wd13nm+"&lad="+wards_to_lads[wd13nm]);
-		//const response = fetch("http://127.0.0.1:5005/fetchData", {ward: wd13nm, lad: wards_to_lads[wd13nm]})
-		let data = response;
-		let count = 0;
+        // const response = fetch("http://127.0.0.1:5005/fetchData?ward="+wd13nm+"&lad="+wards_to_lads[wd13nm]);
+        // fetch("http://127.0.0.1:5005/fetchData?ward="+wd13nm+"&lad="+wards_to_lads[wd13nm]).then(
+
         // for (int i = 0; i < data['age-group'].size())
-        data['age-group'].map((a, v) => {
-            count += v;
-        });
-		console.log(data, count);
+        let count = wards_and_lads_values[[wd13nm, wards_to_lads[wd13nm]]];
         // let colour = (38, 50, 56, 0);
         let colour = "#666666";
         if (count <= 20) {
@@ -102,6 +119,7 @@ c  			.scale(100)
     }
 
 	render() {
+        this.get_all_data();
 		this.state.wardsData.map((d,i) => {
 			if(i == 10) {
 				console.log(d);
