@@ -41,8 +41,31 @@ def getjsafor(ward):
         result = 0
     return result
 
+@app.route('/lads')
+def getAllLads():
+	districts = []
+	data = {'country':"uk", 'districts': []}
+	lads = nomis.get_geo_code(helper='LA_district',value="2092957697TYPE434").values
+	rows, cols = lads.shape
+	for i in range(rows):
+		wards = nomis.get_geo_code(value=str(lads[i][1])+"TYPE236").values
+		wardsGeoData = [wards[j][1] for j in range(wards.shape[0])]
+		data['districts'].append({'districtName':lads[i][0], 'wards':getWardData(wardsGeoData)})
+	return jsonify(data)
+
+def getWardData(wardList):
+	df = nomis._nomis_data(geography=wardList, idx="NM_162_1", age="11,12", measures="20100", gender="0").dropna().values
+	mods = []
+	rows, cols = df.shape
+	for i in range(0, rows, 2):
+		mods.append({'ward_name': df[i][1], "age-group": [
+					{'age_name': df[i][6], 'value': df[i][7]},
+					{'age_name': df[i+1][6], 'value': df[i+1][7]}
+					]})
+	return mods
+
 def getAllWards():
-    # description : name
+   	# description : name
     # value : geo code
     df = nomis.nomis_codes_geog(geography='2092957697TYPE236')
 
@@ -77,7 +100,7 @@ def getAllWards():
                 {"age_name" : each[i][6], "value" :  each[i][7]},
                 {"age_name" : each[i+1][6], "value" :  each[i+1][7]}
             ]})
-        
+
     return jsonify(data)
 
 if __name__== "__main__":
