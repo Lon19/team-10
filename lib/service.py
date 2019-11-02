@@ -19,6 +19,7 @@ def getData():
 	with open('data.json') as f:
 		data = json.load(f)
 	return jsonify(data)
+
 	ladName = request.args.get('lad')
 	wardName = request.args.get('ward')
 	for i in data['districts']:

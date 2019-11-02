@@ -59,10 +59,25 @@ c  			.scale(100)
 	}
 
     async get_all_data() {
-        const response = await fetch("http://127.0.0.1:5005/fetchData");
-        let data = JSON.parse(response);
+        const response = await fetch("http://127.0.0.1:5005/fetchData").then(res=>res.json());
+		console.log(response);
+        let data = JSON.parse(JSON.stringify(response));
+		console.log(data);
         let districts = data['districts'];
-        districts.map((d, ws) => {
+		console.log(districts);
+		for(var i = 0; i < districts.length; i++) {
+			console.log(districts[i]);
+			for (var j = 0; j < districts[i]['wards'].length; j++) {
+				let wl = [];
+				wl.push(districts[i]['wards']['ward_name']);
+				wl.push(districts[i]['districtName']);
+				let total = 0;
+				total += districts[i]['wards']['age-group'][0]['value'];
+				total += districts[i]['wards']['age-group'][1]['value'];
+				wards_and_lads_values[wl] = total;
+			}
+		}
+       /*districts.map((d, ws) => {
             ws.map((w) => {
                 let wl = [];
                 wl.append(w['ward_name']);
@@ -72,7 +87,7 @@ c  			.scale(100)
                 total += w['age-group'][1]['value'];
                 wards_and_lads_values[wl] = total;
             })
-        })
+        })*/
     }
 
 
