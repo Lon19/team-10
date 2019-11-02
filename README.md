@@ -3,24 +3,16 @@
 Sup guys, I dont know how markdown syntax so its ugly, who cares
 
 Folder Structure:
-```
-.
-├── README.md
-├── project
-│   ├── app.py
-│   ├── static
-│   │   └── css
-│   └── templates
-│       └── index.html
-├── requirements.txt
-└── run.sh
-```
 
 Setup:
- - Prequisteries: Python 3
+ - Prequisteries: Python 3, node.js
  - `pip3 install -r requirements.txt`
- 
+ - `npm install`
+
+Build:
+ - `npm run build`
+
 Run:
- - `./run.sh`
+ - `npm run start`
  
  Server hosted on `localhost:5000`
