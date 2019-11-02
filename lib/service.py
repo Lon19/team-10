@@ -1,3 +1,4 @@
+from flask_cors import cross_origin
 from flask import Flask, request, jsonify
 import nomis_api_wrapper
 import ssl
@@ -11,16 +12,23 @@ nomis=nomis_api_wrapper.NOMIS_CONFIG()
 app = Flask(__name__)
 
 @app.route('/fetchData')
+@cross_origin()
 def getData():
 	with open('data.json') as f:
 		data = json.load(f)
+	#return jsonify(data)
 	ladName = request.args.get('lad')
 	wardName = request.args.get('ward')
 	for i in data['districts']:
 		if i['districtName'] == ladName:
 			for j in i['wards']:
 				if j['ward_name'] == wardName:
-					return j
+					print("FOUND-------------------------------------")
+					response = jsonify(j)
+					response.headers.add('Access-Control-Allow-Origin', '*')
+					return response
+	print("Not found----")
+	return jsonify({"message":"Not working"})
 
 @app.route("/ward")
 def wardTotal():
