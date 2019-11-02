@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { BrowserRouter as Router, Route } from "react-router-dom";
 import { geoMercator, geoPath, geoEqualEarth, geoProjection, geoAlbers } from "d3-geo";
+import styles from "./css/index.css";
 import { feature } from "topojson-client";
+import Customisation from "./Customisation"
 
 /*
 import Header from './components/header';
@@ -28,18 +30,21 @@ wards_features.map((w, i) => {
 });
 
 class App extends Component {
+    usesLads = false;
 	constructor() {
 		super()
 		this.state = {
             wardsData: feature(wards, wards.objects.wards).features,
+            ladsData: feature(lads, lads.objects.lad).features,
 		}
+        this.change_region_preference = this.change_region_preference.bind(this);
 	}
 	projection() {
 		return geoAlbers()
         .center([0, 55.4])
            .rotate([4.4, 0])
            .parallels([50, 60])
-			.scale(4000)
+			.scale(3000)
 			.translate([800/2, 450/2])
 		/*geoAlbers()
 			.center([0,42.954])
@@ -51,6 +56,49 @@ class App extends Component {
 		*/
 	}
 
+    async compute_colour(wd13nm) {
+        //const response = await axios.get("http://localhost:5005/fetchData?ward="+wd13nm+"&lad=" + wards_to_lads[wd13nm]);
+        const response = fetch("http://localhost:5005/fetchData", {ward: wd13nm, lad: wards_to_lads[wd13nm]})
+        let data = JSON.parse(response.data);
+        let count = 0;
+        // for (int i = 0; i < data['age-group'].size())
+        data['age-group'].map((a, v) => {
+            count += v;
+        })
+        // let colour = (38, 50, 56, 0);
+        let colour = "#666666";
+        if (count <= 20) {
+            colour = "#00ff00";
+        } else if (count <= 50) {
+            colour = "#006600";
+        } else if (count <= 105) {
+            colour = "ffff00";
+        } else if (count <= 145) {
+            colour = "#ff8106";
+        } else if (count <= 260) {
+            colour = "#990000";
+        } else {
+            colour = "#ff0000";
+        }
+        return colour;
+    }
+
+    change_region_preference(value) {
+        if (value.includes("lads")) {
+            this.setState({
+                usesLads: true
+            })
+        } else {
+            this.setState({
+                usesLads: false
+            })
+        }
+    }
+
+    componentDidUpdate() {
+        this.render();
+    }
+
 	render() {
 		this.state.wardsData.map((d,i) => {
 			if(i == 10) {
@@ -58,24 +106,57 @@ class App extends Component {
 			}
 		})
 		console.log(this.projection())
-		return (
-		    <svg width="800" height="450" viewBox="0 0 800 450">
-		        <g className="wards" transform="scale()">
-		          {this.state.wardsData.map((d,i) => (
-		              <path
-		                key={ `path-${ i }` }
-		                d={ geoPath().projection(this.projection())(d) }
-		                className="ward"
-						data-ward-name={ d.properties.WD13NM }
-		                fill={ `rgba(38,50,56,${1 / this.state.wardsData.length * i})` }
-		                stroke="#FFFFFF"
-		                strokeWidth={ 0.5 }
-		              />
-		            ))
-		          }
-		        </g>
-		      </svg>
-		    )
+        if (!this.state.usesLads) {
+    		return (
+                <div>
+    		    <svg className={styles.left} viewBox="0 0 800 450">
+    		        <g className="wards" transform="scale()">
+    		          {this.state.wardsData.map((d,i) => (
+    		              <path
+    		                key={ `path-${ i }` }
+    		                d={ geoPath().projection(this.projection())(d) }
+    		                className="ward"
+    						data-ward-name={ d.properties.WD13NM }
+    		                fill={  this.compute_colour(d.properties.WD13NM) }
+    		                stroke="#FFFFFF"
+    		                strokeWidth={ 0.5 }
+    		              />
+                      ))
+    		          }
+    		        </g>
+    		      </svg>
+                  <div>
+                    <Customisation cb={this.change_region_preference}>
+                    </Customisation>
+                  </div>
+                  </div>
+    		    )
+        } else {
+            return (
+                <div id="wrapper">
+                    <svg className={styles.left} viewBox="0 0 800 450">
+        		        <g className="wards" transform="scale()">
+        		          {this.state.ladsData.map((d,i) => (
+        		              <path
+        		                key={ `path-${ i }` }
+        		                d={ geoPath().projection(this.projection())(d) }
+        		                className="ward"
+        						data-ward-name={ d.properties.LAD13NM }
+        		                fill={  this.compute_colour(d.properties.LAD13NM) }
+        		                stroke="#FFFFFF"
+        		                strokeWidth={ 0.5 }
+        		              />
+                          ))
+        		          }
+        		        </g>
+        		      </svg>
+                      <div>
+                        <Customisation cb={this.change_region_preference}>
+                        </Customisation>
+                      </div>
+                  </div>
+    		    )
+        }
 	}
 }
 
